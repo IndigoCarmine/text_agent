@@ -117,29 +117,10 @@ def check(config, rag):
         write_markdown_file(str(config.output_file), revised_lines)
         print(f'[OK] 校閲済みファイル: {config.output_file}')
         return
+    
+    revised_lines = []
 
     # 旧ロジック: 1パラグラフずつ通常校閲
-    for heading, paragraphs in sections:
-        revised_lines.append(heading)
-        print(f'[Info] 校閲中: {heading.strip()}')
-        if not paragraphs:
-            continue
-        for para in paragraphs:
-            terminology_context = None
-            if rag:
-                terminology_context = rag.search(para, threshold=config.sim_threshold)
-            prompt = build_prompt([para], config.checks, terminology_context)
-            revised = call_ollama(prompt, config.ollama_model, config.ollama_url, config.temperature)
-            if revised is None:
-                print('[Error] Ollama API呼び出し失敗')
-                return
-            for line in revised.strip().split('\n'):
-                if line.strip():
-                    revised_lines.append(line.strip())
-
-    write_markdown_file(str(config.output_file), revised_lines)
-    print(f'[OK] 校閲済みファイル: {config.output_file}')
-
     for heading, paragraphs in sections:
         revised_lines.append(heading)
         print(f'[Info] 校閲中: {heading.strip()}')
